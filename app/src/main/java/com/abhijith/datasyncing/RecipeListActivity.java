@@ -21,6 +21,7 @@ import com.abhijith.datasyncing.viewmodels.RecipeListViewModel;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader;
+import com.bumptech.glide.load.resource.bitmap.BitmapEncoder;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.util.ViewPreloadSizeProvider;
 
@@ -91,7 +92,6 @@ public class RecipeListActivity extends BaseActivity {
     }
 
     private RequestManager initGlide() {
-
         RequestOptions options = new RequestOptions()
                 .placeholder(R.drawable.white_background)
                 .error(R.drawable.white_background);

@@ -13,7 +13,6 @@ import com.abhijith.datasyncing.persistence.RecipeDao;
 import com.abhijith.datasyncing.persistence.RecipeDatabase;
 import com.abhijith.datasyncing.requests.ServiceGenerator;
 import com.abhijith.datasyncing.requests.responses.ApiResponse;
-import com.abhijith.datasyncing.requests.responses.RecipeResponse;
 import com.abhijith.datasyncing.requests.responses.RecipeSearchResponse;
 import com.abhijith.datasyncing.util.Constants;
 import com.abhijith.datasyncing.util.NetworkBoundResource;
@@ -29,9 +28,11 @@ public class RecipeRepository {
 
     private RecipeDao recipeDao;
 
+    int lastFetch = 0;
+
     //make singleton
-    public static RecipeRepository getInstance(Context context){
-        if(instance == null){
+    public static RecipeRepository getInstance(Context context) {
+        if (instance == null) {
             instance = new RecipeRepository(context);
         }
         return instance;
@@ -42,17 +43,17 @@ public class RecipeRepository {
         recipeDao = RecipeDatabase.getInstance(context).getRecipeDao();
     }
 
-    public LiveData<Resource<List<Recipe>>> searchRecipesApi(final String query, final int pageNumber){
-        return new NetworkBoundResource<List<Recipe>, RecipeSearchResponse>(AppExecutors.getInstance()){
+    public LiveData<Resource<List<Recipe>>> searchRecipesApi(final String query, final int pageNumber) {
+        return new NetworkBoundResource<List<Recipe>, RecipeSearchResponse>(AppExecutors.getInstance()) {
 
             @Override
             protected void saveCallResult(@NonNull RecipeSearchResponse item) {
 
-                if(item.getRecipes() != null){
+                if (item.getRecipes() != null) {
                     Recipe[] recipes = new Recipe[item.getRecipes().size()];
                     int index = 0;
-                    for(long rowid: recipeDao.insertRecipes((Recipe[]) (item.getRecipes().toArray(recipes)))){
-                        if(rowid == -1){
+                    for (long rowid : recipeDao.insertRecipes((Recipe[]) (item.getRecipes().toArray(recipes)))) {
+                        if (rowid == -1) {
                             recipeDao.updateRecipe(
                                     recipes[index].getRecipe_id(),
                                     recipes[index].getTitle(),
@@ -66,9 +67,10 @@ public class RecipeRepository {
                 }
             }
 
+
             @Override
             protected boolean shouldFetch(@Nullable List<Recipe> data) {
-
+                //decide if u want to fetch new data or use cached one
                 return true;
             }
 
